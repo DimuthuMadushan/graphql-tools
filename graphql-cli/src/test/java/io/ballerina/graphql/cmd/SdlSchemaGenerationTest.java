@@ -272,7 +272,8 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         try {
             graphqlCmd.execute();
             String output = readOutput(true);
-            Assert.assertTrue(output.contains("Given Ballerina file contains compilation error(s)."));
+            Assert.assertTrue(output.contains(
+                    "ERROR [service1.bal:(20:23,20:26)] Given Ballerina file contains compilation error(s)."));
         } catch (BLauncherException | IOException e) {
             Assert.fail(e.toString());
         }

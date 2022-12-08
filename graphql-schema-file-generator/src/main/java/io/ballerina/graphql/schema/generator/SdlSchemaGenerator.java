@@ -41,7 +41,9 @@ import io.ballerina.projects.ProjectKind;
 import io.ballerina.projects.directory.ProjectLoader;
 import io.ballerina.stdlib.graphql.commons.types.Schema;
 import io.ballerina.stdlib.graphql.commons.utils.SdlSchemaStringGenerator;
+import io.ballerina.tools.diagnostics.Diagnostic;
 import io.ballerina.tools.diagnostics.DiagnosticSeverity;
+import io.ballerina.tools.diagnostics.Location;
 
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -50,6 +52,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static io.ballerina.graphql.schema.Constants.EMPTY_STRING;
 import static io.ballerina.graphql.schema.Constants.PERIOD;
@@ -223,18 +227,17 @@ public class SdlSchemaGenerator {
      */
     private static PackageCompilation getPackageCompilation(Project project) throws SchemaFileGenerationException {
         DiagnosticResult diagnosticResult = project.currentPackage().runCodeGenAndModifyPlugins();
-        boolean hasErrors = diagnosticResult
-                .diagnostics().stream()
-                .anyMatch(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()));
-        if (!hasErrors) {
+        Optional<Diagnostic> diagnostic = diagnosticResult.diagnostics().stream()
+                .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity())).findFirst();
+        if (!diagnostic.isPresent()) {
             PackageCompilation compilation = project.currentPackage().getCompilation();
-            hasErrors = compilation.diagnosticResult()
-                    .diagnostics().stream()
-                    .anyMatch(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity()));
-            if (!hasErrors) {
+            diagnosticResult = compilation.diagnosticResult();
+            diagnostic = diagnosticResult.diagnostics().stream()
+                    .filter(d -> DiagnosticSeverity.ERROR.equals(d.diagnosticInfo().severity())).findFirst();
+            if (!diagnostic.isPresent()) {
                 return compilation;
             }
         }
-        throw new SchemaFileGenerationException(DiagnosticMessages.SDL_SCHEMA_100, null);
+        throw new SchemaFileGenerationException(DiagnosticMessages.SDL_SCHEMA_100, diagnostic.get().location());
     }
 }
