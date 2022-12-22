@@ -105,18 +105,18 @@ jar {
     }
 }
 
-def disableGroups = ""
+def disableGroups = "sdl_schema_gen"
 
-task initializeVariables {
-    if (project.hasProperty("disable")) {
-        disableGroups = project.findProperty("disable")
-    }
-}
+//task initializeVariables {
+//    if (project.hasProperty("disable")) {
+//        disableGroups = project.findProperty("disable")
+//    }
+//}
 
 test {
     dependsOn {
         copyStdlibs
-        initializeVariables
+//        initializeVariables
     }
     systemProperty "ballerina.home", bDistribution
 

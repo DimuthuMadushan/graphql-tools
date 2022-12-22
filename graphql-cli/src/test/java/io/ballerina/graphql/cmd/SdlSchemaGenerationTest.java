@@ -35,7 +35,10 @@ import java.nio.file.Paths;
  */
 public class SdlSchemaGenerationTest extends GraphqlTest {
 
-    @Test(description = "Test successful GraphQL command execution")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution"
+    )
     public void testSdlGeneration() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service1.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -53,7 +56,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution"
+    )
     public void testSdlGenerationWithProject() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid/project_1", "main.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -71,7 +77,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with service name")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with service name"
+    )
     public void testSdlGenerationWithServiceBasePath() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service2.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString(), "-s", "/service/gql"};
@@ -89,7 +98,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with multiple services")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with multiple services"
+    )
     public void testSdlGenerationWithMultipleServices1() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service3.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -119,7 +131,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with multiple services")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with multiple services"
+    )
     public void testSdlGenerationWithMultipleServices2() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service4.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -149,7 +164,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with multiple services in a bal project")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with multiple services in a bal project"
+    )
     public void testSdlGenerationWithMultipleServicesInProject() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid/project_2", "main.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -179,7 +197,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with module-level variable service declaration")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with module-level variable service declaration"
+    )
     public void testExecuteWithModuleLevelVariableDeclaration() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service6.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -197,7 +218,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with multiple types services")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with multiple types services"
+    )
     public void testSdlGenerationForGraphqlServiceWithHttService() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service7.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -215,7 +239,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with services include custom scalars")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with services include custom scalars"
+    )
     public void testSdlGenerationWithCustomScalars() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service8.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString(), "-s", "/gql"};
@@ -233,7 +260,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test successful GraphQL command execution with multiple services in same listener")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test successful GraphQL command execution with multiple services in same listener"
+    )
     public void testSdlGenerationWithMultipleServicesInSameListener() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/valid", "service9.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -263,7 +293,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test GraphQL command execution with service includes compilation errors")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test GraphQL command execution with service includes compilation errors"
+    )
     public void testExecuteWithBalFileIncludeCompilationErrors() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/invalid", "service1.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString()};
@@ -279,7 +312,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test GraphQL command execution with invalid service base path")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test GraphQL command execution with invalid service base path"
+    )
     public void testExecuteWithInvalidServiceName() {
         Path graphqlService = resourceDir.resolve(Paths.get("graphqlServices/invalid", "service2.bal"));
         String[] args = {"-i", graphqlService.toString(), "-o", this.tmpDir.toString(), "-s", "/service/gql"};
@@ -296,7 +332,10 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
         }
     }
 
-    @Test(description = "Test GraphQL command execution with invalid input file path")
+    @Test(
+            groups = {"sdl_schema_gen"},
+            description = "Test GraphQL command execution with invalid input file path"
+    )
     public void testExecuteWithInvalidBalFilePath() {
         String[] args = {"-i", "/service.bal", "-o", this.tmpDir.toString()};
         GraphqlCmd graphqlCmd = new GraphqlCmd(printStream, tmpDir, false);
@@ -313,7 +352,7 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
     }
 
     @Test(
-        groups = {"invalid_permission"},
+        groups = {"sdl_schema_gen", "invalid_permission"},
         description = "Test GraphQL command execution with readonly output path"
     )
     public void testExecuteWithReadonlyOutputPath() {
@@ -338,7 +377,7 @@ public class SdlSchemaGenerationTest extends GraphqlTest {
     }
 
     @Test(
-        groups = {"invalid_permission"},
+        groups = {"sdl_schema_gen", "invalid_permission"},
         description = "Test GraphQL command execution with bal file without read permission"
     )
     public void testSdlGenerationWithBalFileWithoutReadPermission() {
