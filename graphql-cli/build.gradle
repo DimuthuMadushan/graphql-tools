@@ -15,8 +15,15 @@
  *
  */
 
-apply plugin: "com.github.johnrengelman.shadow"
-apply plugin: "jacoco"
+plugins {
+    id "com.github.johnrengelman.shadow"
+    id "jacoco"
+    id "checkstyle"
+}
+
+configurations.all {
+    resolutionStrategy.preferProjectModules()
+}
 
 configurations {
     balTools
@@ -26,7 +33,11 @@ configurations {
 }
 
 dependencies {
+    checkstyle project(':checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${project.puppycrawlCheckstyleVersion}"
+
     implementation project(':graphql-schema-file-generator')
+    implementation project(':graphql-code-generator')
     implementation "org.ballerinalang:ballerina-lang:${ballerinaLangVersion}"
     implementation "org.ballerinalang:ballerina-parser:${ballerinaLangVersion}"
     implementation "org.ballerinalang:ballerina-cli:${ballerinaLangVersion}"
@@ -34,6 +45,7 @@ dependencies {
     implementation "org.ballerinalang:ballerina-tools-api:${ballerinaLangVersion}"
     implementation "info.picocli:picocli:${picocliVersion}"
     testImplementation "org.testng:testng:${testngVersion}"
+    testImplementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
     implementation "commons-io:commons-io:${commonsIoVersion}"
     implementation "commons-logging:commons-logging:${commonsLoggingVersion}" // NEW
     implementation "org.yaml:snakeyaml:${snakeYamlVersion}" // NEW
@@ -48,6 +60,20 @@ dependencies {
         transitive = false
     }
 }
+
+def excludePattern = '**/module-info.java'
+tasks.withType(Checkstyle) {
+    exclude excludePattern
+}
+
+checkstyle {
+    toolVersion "${project.puppycrawlCheckstyleVersion}"
+    configFile rootProject.file("config/checkstyle/build/checkstyle.xml")
+    configProperties = ["suppressionFile" : file("${rootDir}/config/checkstyle/build/suppressions.xml")]
+}
+
+checkstyleMain.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
+checkstyleTest.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
 
 def bDistribution = file("$project.buildDir/extracted-distribution/jballerina-tools-${ballerinaLangVersion}")
 task jBallerinaPack {
@@ -79,6 +105,7 @@ task copyStdlibs(type: Copy) {
     def ballerinaDist = "$project.buildDir/extracted-distribution/jballerina-tools-${ballerinaLangVersion}"
     into ballerinaDist
 
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
         def artifactExtractedPath = "${project.buildDir}/extracted-distribution/" + artifact.name + "-zip"
@@ -93,6 +120,7 @@ task copyStdlibs(type: Copy) {
 
 task copyJar(type: Copy) {
     from "$project.rootDir/graphql-schema-file-generator/build/libs/graphql-schema-file-generator-${version}.jar"
+    from "$project.rootDir/graphql-code-generator/build/libs/graphql-code-generator-${version}.jar"
     from "$project.buildDir/libs/graphql-cli-${version}.jar"
     into "$project.buildDir/extracted-distribution/jballerina-tools-${ballerinaLangVersion}/bre/lib"
 }
@@ -114,11 +142,21 @@ task initializeVariables {
 }
 
 test {
+    systemProperties = [ "target.dir": "$project.buildDir",
+                         "distributions.dir": bDistribution,
+                         "ballerina.home": bDistribution,
+                         "ballerina.version": "jballerina-tools-${ballerinaLangVersion}"
+    ]
+
+    testLogging {
+        showStackTraces = true
+        showStandardStreams = true
+    }
+
     dependsOn {
         copyStdlibs
         initializeVariables
     }
-    systemProperty "ballerina.home", bDistribution
 
     useTestNG() {
         excludeGroups(disableGroups)
@@ -128,14 +166,17 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.10"
     reportsDirectory = file("$rootProject.projectDir/build/reports/jacoco")
 }
 
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
     def classFiles = new File("${rootDir}/graphql-schema-file-generator/build/classes/java/main/io/ballerina/graphql/schema")
+    def codeGenFiles = new File("${rootDir}/graphql-code-generator/build/classes/java/main/io/ballerina/graphql" +
+            "/generator")
     additionalClassDirs(classFiles)
+    additionalClassDirs(codeGenFiles)
     reports {
         xml.required = true
     }
@@ -152,6 +193,8 @@ compileJava {
 
 def packageName = "graphql"
 
+jBallerinaPack.dependsOn ":${packageName}-schema-file-generator:build"
+jBallerinaPack.dependsOn ":${packageName}-code-generator:build"
 unpackStdLibs.dependsOn jBallerinaPack
 copyStdlibs.dependsOn unpackStdLibs
 shadowJar.dependsOn copyStdlibs
@@ -159,6 +202,5 @@ copyJar.dependsOn shadowJar
 copyJar.dependsOn jar
 test.dependsOn copyJar
 jacocoTestReport.dependsOn test
-test.dependsOn ":${packageName}-schema-file-generator:build"
 
 build.dependsOn(jacocoTestReport)
